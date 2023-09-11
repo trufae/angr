@@ -53,6 +53,7 @@ class StructurerBase(Analysis):
         case_entry_to_switch_head: Optional[Dict[int, int]] = None,
         parent_region=None,
         improve_structurer=True,
+        variable_creator=None,
         **kwargs,
     ):
         self._region: "GraphRegion" = region
@@ -61,6 +62,7 @@ class StructurerBase(Analysis):
         self._case_entry_to_switch_head = case_entry_to_switch_head
         self._parent_region = parent_region
         self._improve_structurer = improve_structurer
+        self._variable_creator = variable_creator
 
         self.cond_proc = (
             condition_processor if condition_processor is not None else ConditionProcessor(self.project.arch)

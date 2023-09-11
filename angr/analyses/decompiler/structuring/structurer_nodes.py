@@ -103,18 +103,22 @@ class BaseNode:
 class SequenceNode(BaseNode):
     __slots__ = (
         "addr",
+        "idx",
         "nodes",
     )
 
-    def __init__(self, addr: Optional[int], nodes=None):
+    def __init__(self, addr: Optional[int], nodes=None, idx: Optional[int] = None):
         self.addr = addr
+        self.idx = idx
         self.nodes = nodes if nodes is not None else []
 
     def __repr__(self):
         if self.addr is None:
             return "<SequenceNode, %d nodes>" % len(self.nodes)
         else:
-            return "<SequenceNode %#x, %d nodes>" % (self.addr, len(self.nodes))
+            if self.idx is None:
+                return "<SequenceNode %#x, %d nodes>" % (self.addr, len(self.nodes))
+            return f"<SequenceNode {self.addr:#x}.{self.idx}, {len(self.nodes)} nodes>"
 
     def add_node(self, node):
         self.nodes.append(node)
@@ -129,7 +133,7 @@ class SequenceNode(BaseNode):
         return self.nodes.index(node)
 
     def copy(self):
-        return SequenceNode(self.addr, nodes=self.nodes[::])
+        return SequenceNode(self.addr, nodes=self.nodes[::], idx=self.idx)
 
     def dbg_repr(self, indent=0):
         s = ""
