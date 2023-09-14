@@ -54,6 +54,7 @@ class StructurerBase(Analysis):
         parent_region=None,
         improve_structurer=True,
         variable_creator=None,
+        node_id_manager=None,
         **kwargs,
     ):
         self._region: "GraphRegion" = region
@@ -63,6 +64,7 @@ class StructurerBase(Analysis):
         self._parent_region = parent_region
         self._improve_structurer = improve_structurer
         self._variable_creator = variable_creator
+        self._node_id_manager = node_id_manager
 
         self.cond_proc = (
             condition_processor if condition_processor is not None else ConditionProcessor(self.project.arch)
