@@ -1,7 +1,7 @@
 # pylint:disable=too-many-boolean-expressions
 from __future__ import annotations
 import logging
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING
 from collections.abc import Iterable
 
 from ailment.statement import Statement, Assignment, Call, Store, Jump
@@ -28,7 +28,7 @@ from .utils import peephole_optimize_exprs, peephole_optimize_stmts, peephole_op
 
 if TYPE_CHECKING:
     from angr.storage.memory_mixins.paged_memory.pages.multi_values import MultiValues
-    from angr.knowledge_plugins.key_definitions.live_definitions import LiveDefinitions, Definition
+    from angr.knowledge_plugins.key_definitions.live_definitions import Definition
     from ailment.block import Block
 
 
@@ -44,11 +44,11 @@ class HasCallExprWalker(AILBlockWalkerBase):
         super().__init__()
         self.has_call_expr = False
 
-    def _handle_Call(self, stmt_idx: int, stmt: Call, block: Optional["Block"]):  # pylint:disable=unused-argument
+    def _handle_Call(self, stmt_idx: int, stmt: Call, block: Block | None):  # pylint:disable=unused-argument
         self.has_call_expr = True
 
     def _handle_CallExpr(  # pylint:disable=unused-argument
-        self, expr_idx: int, expr: Call, stmt_idx: int, stmt: Statement, block: Optional["Block"]
+        self, expr_idx: int, expr: Call, stmt_idx: int, stmt: Statement, block: Block | None
     ):
         self.has_call_expr = True
 
@@ -60,7 +60,7 @@ class BlockSimplifier(Analysis):
 
     def __init__(
         self,
-        block: Optional["Block"],
+        block: Block | None,
         func_addr: int | None = None,
         remove_dead_memdefs=False,
         stack_pointer_tracker=None,
@@ -214,7 +214,7 @@ class BlockSimplifier(Analysis):
         replace_loads: bool = False,
         gp: int | None = None,
         replace_registers: bool = True,
-    ) -> tuple[bool, "Block"]:
+    ) -> tuple[bool, Block]:
         new_statements = block.statements[::]
         replaced = False
 
@@ -317,7 +317,7 @@ class BlockSimplifier(Analysis):
 
         # Find dead assignments
         dead_defs_stmt_idx = set()
-        all_defs: Iterable["Definition"] = rd.get_all_tmp_definitions(block_loc)
+        all_defs: Iterable[Definition] = rd.get_all_tmp_definitions(block_loc)
         mask = (1 << self.project.arch.bits) - 1
         stackarg_offsets = (
             {(tpl[1] & mask) for tpl in self._stack_arg_offsets} if self._stack_arg_offsets is not None else None
@@ -348,15 +348,13 @@ class BlockSimplifier(Analysis):
                     defs_ = set()
                     if isinstance(d.atom, atoms.Register):
                         try:
-                            vs: "MultiValues" = live_defs.registers.load(d.atom.reg_offset, size=d.atom.size)
+                            vs: MultiValues = live_defs.registers.load(d.atom.reg_offset, size=d.atom.size)
                         except SimMemoryMissingError:
                             vs = None
                     elif isinstance(d.atom, atoms.MemoryLocation) and isinstance(d.atom.addr, SpOffset):
                         stack_addr = live_defs.stack_offset_to_stack_addr(d.atom.addr.offset)
                         try:
-                            vs: "MultiValues" = live_defs.stack.load(
-                                stack_addr, size=d.atom.size, endness=d.atom.endness
-                            )
+                            vs: MultiValues = live_defs.stack.load(stack_addr, size=d.atom.size, endness=d.atom.endness)
                         except SimMemoryMissingError:
                             vs = None
                     else:

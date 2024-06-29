@@ -1,6 +1,6 @@
 # pylint:disable=too-many-boolean-expressions
 from __future__ import annotations
-from typing import Any, Optional, TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 from collections import defaultdict
 import logging
 
@@ -40,7 +40,6 @@ from .expression_counters import SingleExpressionCounter
 
 if TYPE_CHECKING:
     from ailment.manager import Manager
-    from angr.analyses.reaching_definitions import ReachingDefinitionsModel
 
 
 _l = logging.getLogger(__name__)
@@ -80,7 +79,7 @@ class AILSimplifier(Analysis):
         remove_dead_memdefs=False,
         stack_arg_offsets: set[tuple[int, int]] | None = None,
         unify_variables=False,
-        ail_manager: Optional["Manager"] = None,
+        ail_manager: Manager | None = None,
         gp: int | None = None,
         narrow_expressions=False,
         only_consts=False,
