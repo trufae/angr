@@ -1,3 +1,4 @@
+from __future__ import annotations
 import logging
 from typing import Optional, DefaultDict, Any, Union, TYPE_CHECKING
 from collections.abc import Iterable
@@ -13,7 +14,7 @@ from ...codenode import CodeNode
 from ...engines.light import SimEngineLight
 from ...knowledge_plugins.functions import Function
 from ...knowledge_plugins.key_definitions import ReachingDefinitionsModel, LiveDefinitions
-from ...knowledge_plugins.key_definitions.constants import OP_BEFORE, OP_AFTER, ObservationPointType
+from ...knowledge_plugins.key_definitions.constants import OP_BEFORE, OP_AFTER, ObservationPointType, ObservationPoint
 from ...code_location import CodeLocation, ExternalCodeLocation
 from ...misc.ux import deprecated
 from ..forward_analysis.visitors.graph import NodeType
@@ -26,12 +27,6 @@ from .subject import Subject, SubjectType
 from .function_handler import FunctionHandler, FunctionCallRelationships
 from .dep_graph import DepGraph
 
-if TYPE_CHECKING:
-    from typing import Literal
-
-    ObservationPoint = tuple[
-        Literal["insn", "node", "stmt", "exit"], Union[int, tuple[int, int], tuple[int, int, int]], ObservationPointType
-    ]
 
 l = logging.getLogger(name=__name__)
 
