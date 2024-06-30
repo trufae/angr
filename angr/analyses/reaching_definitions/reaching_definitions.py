@@ -1,6 +1,6 @@
 from __future__ import annotations
 import logging
-from typing import Optional, DefaultDict, Any
+from typing import DefaultDict, Any
 from collections.abc import Iterable
 from collections import defaultdict
 
@@ -59,7 +59,7 @@ class ReachingDefinitionsAnalysis(
         init_context=None,
         state_initializer: RDAStateInitializer | None = None,
         cc=None,
-        function_handler: Optional[FunctionHandler] = None,
+        function_handler: FunctionHandler | None = None,
         observe_all=False,
         visited_blocks=None,
         dep_graph: DepGraph | bool | None = True,
