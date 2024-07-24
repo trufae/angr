@@ -8,7 +8,7 @@ from .block_simplifier import BlockSimplifier
 from .callsite_maker import CallSiteMaker
 from .ail_simplifier import AILSimplifier
 from .ssailification import Ssailification
-from .dephication import Dephication
+from .dephication import GraphDephication, SeqNodeDephication
 from . import structuring
 from . import optimization_passes
 

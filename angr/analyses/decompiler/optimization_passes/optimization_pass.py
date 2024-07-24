@@ -3,6 +3,7 @@ import logging
 from typing import TYPE_CHECKING
 from collections.abc import Generator
 from enum import Enum
+import logging
 
 import networkx  # pylint:disable=unused-import
 import ailment
@@ -16,6 +17,9 @@ from angr.analyses.decompiler.seq_cf_structure_counter import ControlFlowStructu
 
 if TYPE_CHECKING:
     from angr.knowledge_plugins.functions import Function
+
+_l = logging.getLogger(__name__)
+
 
 _l = logging.getLogger(__name__)
 
@@ -98,13 +102,21 @@ class BaseOptimizationPass:
         raise NotImplementedError()
 
     def _simplify_graph(self, graph):
-        simp = self.project.analyses.AILSimplifier(
-            self._func,
-            func_graph=graph,
-            use_callee_saved_regs_at_return=False,
-            gp=self._func.info.get("gp", None) if self.project.arch.name in {"MIPS32", "MIPS64"} else None,
-        )
-        return simp.func_graph if simp.simplified else graph
+        MAX_SIMP_ITERATION = 8
+        for _ in range(MAX_SIMP_ITERATION):
+            simp = self.project.analyses.AILSimplifier(
+                self._func,
+                func_graph=graph,
+                use_callee_saved_regs_at_return=False,
+                gp=self._func.info.get("gp", None) if self.project.arch.name in {"MIPS32", "MIPS64"} else None,
+            )
+            if simp.simplified:
+                graph = simp.func_graph
+            else:
+                break
+        else:
+            _l.warning("Failed to reach fixed point after %s simplification iterations.", MAX_SIMP_ITERATION)
+        return graph
 
     def _recover_regions(self, graph: networkx.DiGraph, condition_processor=None, update_graph: bool = False):
         return self.project.analyses[RegionIdentifier].prep(kb=self.kb)(
@@ -132,6 +144,7 @@ class OptimizationPass(BaseOptimizationPass):
         variable_kb=None,
         region_identifier=None,
         reaching_definitions=None,
+        vvar_id_start=None,
         **kwargs,
     ):
         super().__init__(func)
@@ -143,6 +156,7 @@ class OptimizationPass(BaseOptimizationPass):
         self._ri = region_identifier
         self._rd = reaching_definitions
         self._new_block_addrs = set()
+        self.vvar_id_start = vvar_id_start
 
         # output
         self.out_graph: networkx.DiGraph | None = None
