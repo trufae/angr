@@ -32,7 +32,7 @@ class SimEngineVRAIL(
     The engine for variable recovery on AIL.
     """
 
-    state: "VariableRecoveryFastState"
+    state: VariableRecoveryFastState
     block: ailment.Block
 
     def __init__(self, *args, call_info=None, vvar_to_vvar: dict[int, int] | None, **kwargs):
