@@ -9,6 +9,7 @@ import networkx
 import ailment
 
 import angr
+from angr.utils.ail import is_phi_assignment
 from .call_counter import AILBlockCallCounter
 from .seq_to_blocks import SequenceToBlocks
 
@@ -337,6 +338,12 @@ def has_nonlabel_statements(block: ailment.Block) -> bool:
     return block.statements and any(not isinstance(stmt, ailment.Stmt.Label) for stmt in block.statements)
 
 
+def has_nonlabel_nonphi_statements(block: ailment.Block) -> bool:
+    return block.statements and any(
+        not (isinstance(stmt, ailment.Stmt.Label) and is_phi_assignment(stmt)) for stmt in block.statements
+    )
+
+
 def first_nonlabel_statement(block: Union[ailment.Block, "MultiNode"]) -> ailment.Stmt.Statement | None:
     if isinstance(block, MultiNode):
         for n in block.nodes:
@@ -347,6 +354,20 @@ def first_nonlabel_statement(block: Union[ailment.Block, "MultiNode"]) -> ailmen
 
     for stmt in block.statements:
         if not isinstance(stmt, ailment.Stmt.Label):
+            return stmt
+    return None
+
+
+def first_nonlabel_nonphi_statement(block: Union[ailment.Block, "MultiNode"]) -> ailment.Stmt.Statement | None:
+    if isinstance(block, MultiNode):
+        for n in block.nodes:
+            stmt = first_nonlabel_nonphi_statement(n)
+            if stmt is not None:
+                return stmt
+        return None
+
+    for stmt in block.statements:
+        if not isinstance(stmt, ailment.Stmt.Label) and not is_phi_assignment(stmt):
             return stmt
     return None
 
