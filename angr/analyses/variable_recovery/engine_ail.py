@@ -173,10 +173,7 @@ class SimEngineVRAIL(
         else:
             # update the return value register
             if isinstance(ret_expr, ailment.Expr.VirtualVariable):
-                if return_value_use_full_width_reg:
-                    expr_bits = self.state.arch.bits
-                else:
-                    expr_bits = ret_expr_bits
+                expr_bits = ret_expr_bits
                 self._assign_to_vvar(
                     ret_expr,
                     RichR(self.state.top(expr_bits), typevar=ret_ty),
