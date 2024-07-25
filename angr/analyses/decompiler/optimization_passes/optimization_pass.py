@@ -1,6 +1,5 @@
 # pylint:disable=unused-argument
-import logging
-from typing import TYPE_CHECKING
+from __future__ import annotations
 from collections.abc import Generator
 from enum import Enum
 import logging
@@ -14,11 +13,7 @@ from angr.analyses.decompiler.goto_manager import GotoManager
 from angr.analyses.decompiler.structuring import RecursiveStructurer, PhoenixStructurer
 from angr.analyses.decompiler.utils import add_labels
 from angr.analyses.decompiler.seq_cf_structure_counter import ControlFlowStructureCounter
-
-if TYPE_CHECKING:
-    from angr.knowledge_plugins.functions import Function
-
-_l = logging.getLogger(__name__)
+from angr.knowledge_plugins.functions import Function
 
 
 _l = logging.getLogger(__name__)
@@ -67,7 +62,7 @@ class BaseOptimizationPass:
     DESCRIPTION = "N/A"
 
     def __init__(self, func):
-        self._func: "Function" = func
+        self._func: Function = func
 
     @property
     def project(self):
