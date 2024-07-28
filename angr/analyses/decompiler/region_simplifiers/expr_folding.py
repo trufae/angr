@@ -8,6 +8,7 @@ from ailment import Expression, Block, AILBlockWalker
 from ailment.expression import ITE
 from ailment.statement import Statement, Assignment, Call
 
+from angr.utils.ail import is_phi_assignment
 from ..sequence_walker import SequenceWalker
 from ..structuring.structurer_nodes import (
     ConditionNode,
@@ -228,6 +229,8 @@ class ExpressionCounter(SequenceWalker):
 
     def _handle_Statement(self, idx: int, stmt: ailment.Stmt, node: ailment.Block | LoopNode):
         if isinstance(stmt, ailment.Stmt.Assignment):
+            if is_phi_assignment(stmt):
+                return
             if (
                 isinstance(stmt.dst, ailment.Expr.VirtualVariable)
                 and stmt.dst.was_reg
