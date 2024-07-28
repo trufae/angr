@@ -485,7 +485,15 @@ def structured_node_is_simple_return(node: Union["SequenceNode", "MultiNode"], g
     if valid_last_stmt and last_block.statements:
         valid_last_stmt = not isinstance(last_block.statements[-1], (ailment.Stmt.ConditionalJump, ailment.Stmt.Jump))
 
-    return valid_last_stmt and last_block in graph and not list(graph.successors(last_block))
+    if valid_last_stmt:
+        # note that the block may not be the same block in the AIL graph post dephication. we must find the block again
+        # in the graph.
+        for bb in graph:
+            if bb.addr == last_block.addr and bb.idx == last_block.idx:
+                # found it
+                succs = list(graph.successors(bb))
+                return not succs or succs == [bb]
+    return False
 
 
 def is_statement_terminating(stmt: ailment.statement.Statement, functions) -> bool:
