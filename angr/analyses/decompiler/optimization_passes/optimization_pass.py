@@ -198,7 +198,7 @@ class OptimizationPass(BaseOptimizationPass):
                 "There are %d blocks at address %#x.%s but only one is requested." % (len(blocks), addr, idx)
             )
 
-    def _get_blocks(self, addr, idx=None) -> Generator[ailment.Block, None, None]:
+    def _get_blocks(self, addr, idx=None) -> Generator[ailment.Block]:
         if not self._blocks_by_addr:
             return
         else:
