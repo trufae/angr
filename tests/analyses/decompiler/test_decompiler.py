@@ -2835,7 +2835,7 @@ class TestDecompiler(unittest.TestCase):
         #         qsort();
         #     }
         #     return;
-        assert re.search(r"if\(.+?\)\{.+?\}return", text) is not None
+        assert re.search(r"if\(.+?\).+qsort\(.*\);.*return", text) is not None
 
     @for_all_structuring_algos
     def test_ret_dedupe_fakeret_2(self, decompiler_options=None):
