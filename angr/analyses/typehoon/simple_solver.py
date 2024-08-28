@@ -416,7 +416,7 @@ class SimpleSolver:
         """
 
         typevars = set(self._constraints) | self._typevars
-        typevars = set(self._equivalence.get(tv, tv) for tv in typevars)
+        typevars = {self._equivalence.get(tv, tv) for tv in typevars}
 
         constraints = set()
         for tv in typevars:
